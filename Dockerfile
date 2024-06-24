@@ -19,3 +19,6 @@ COPY --from=build /app/target/demo-0.0.1-SNAPSHOT.jar app.jar
 
 # Definir el comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Exponer el puerto 8080
+EXPOSE 8080
