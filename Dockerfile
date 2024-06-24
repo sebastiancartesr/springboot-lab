@@ -1,4 +1,4 @@
-# Utilizar la imagen oficial de Maven para compilar la aplicación
+# Etapa de construcción
 FROM maven:3.8.4-openjdk-17 AS build
 WORKDIR /app
 
@@ -10,15 +10,15 @@ RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Utilizar la imagen oficial de OpenJDK para correr la aplicación
-FROM openjdk:17-jdk-slim
-WORKDIR /app
+# Etapa de despliegue
+FROM tomcat:10.1.10-jdk17
+WORKDIR /usr/local/tomcat/webapps/
 
-# Copiar el JAR generado desde la fase de compilación anterior
-COPY --from=build /app/target/demo-0.0.1-SNAPSHOT.jar app.jar
-
-# Definir el comando para ejecutar la aplicación
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Copiar el WAR generado desde la fase de compilación anterior
+COPY --from=build /app/target/demo-0.0.1-SNAPSHOT.war ./ROOT.war
 
 # Exponer el puerto 8080
 EXPOSE 8080
+
+# Iniciar Tomcat
+CMD ["catalina.sh", "run"]
